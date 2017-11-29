@@ -1,0 +1,81 @@
+/* Polices */
+@import url('https://fonts.googleapis.com/css?family=Lobster|Quicksand|Montserrat:100');
+
+/*----------------------------------------------*/
+
+/* Général */
+body {
+  font-family: 'Quicksand', sans-serif;
+}
+
+header {
+  padding: 10px;
+}
+
+header div {
+  margin: auto;
+}
+
+.logo a{
+  text-decoration: none;
+  color: black;
+}
+
+.logo-tdl {
+  font-family: 'Lobster', sans-serif;
+}
+
+.logo-store {
+  font-family: 'Montserrat:100', 'Quicksand' , sans-serif;
+  color: grey;
+}
+
+/*----------------------------------------------*/
+
+/* store.php */
+.card-showroom {
+  word-wrap: break-word;
+  width: 300px;
+  height: 430px;
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+}
+
+.card-prix-add {
+  display: flex;
+  justify-content: space-between;
+}
+
+.prix {
+  font-size: 30px;
+  font-weight: bolder;
+}
+
+.preferences-lien{
+  margin-bottom: 10px;
+}
+
+/*----------------------------------------------*/
+
+/* panier.php */
+.card-panier {
+  width: 100%;
+  display: inline-flex;
+  text-align: left;
+}
+
+.total p{
+  font-size: 20px;
+  border: 1px solid black;
+  border-radius: 30px;
+  text-align: center;
+}
+
+
+
+
+
