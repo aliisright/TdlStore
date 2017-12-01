@@ -1,5 +1,6 @@
 <?php
 
+//Classe de connexion à la base de donnée
   class DB {
     private $dsn;
     private $user;
@@ -38,11 +39,12 @@
 
   }
 
-
-
+//Classe de connexion à la base de donnée
   class panier {
 
     private $DB;
+    private $reduction = 0;
+    private $quantite = 0;
 
 
     public function __construct() {
@@ -72,23 +74,28 @@
       return $countPanier;
     }
 
-    public function add($idAddProduit) {
+    public function add($quantite, $idProduit) {
 
-      if(isset($_SESSION['panier'][$idAddProduit])) {
-        $_SESSION['panier'][$idAddProduit]++;
+      if($quantite > 0){
+        if(isset($_SESSION['panier'][$idProduit])) {
+        $_SESSION['panier'][$idProduit]++;
 
+        } else {
+          $_SESSION['panier'][$idProduit]=1;
+        }
       } else {
-        $_SESSION['panier'][$idAddProduit]=1;
+        $message = "Produit épuisé";
       }
+
     }
 
-    public function del($idDelProduit) {
+    public function del($idProduit) {
 
-      if($_SESSION['panier'][$idDelProduit]>1) {
-        $_SESSION['panier'][$idDelProduit]--;
+      if($_SESSION['panier'][$idProduit]>1) {
+        $_SESSION['panier'][$idProduit]--;
 
       } else {
-        unset($_SESSION['panier'][$idDelProduit]);
+        unset($_SESSION['panier'][$idProduit]);
       }
     }
 
@@ -99,8 +106,13 @@
       $produits = $DB->dbQuery('SELECT * FROM produits WHERE id IN ('.implode(',', $ids).')');
 
       foreach ($produits as $produit) {
-        $_SESSION['panier'][$idUnsetProduit] = 0;
+        unset($_SESSION['panier'][$idUnsetProduit]);
       }
+    }
+
+    public function setReduction($reduction) {
+
+      $this->reduction = $reduction;
     }
 
     public function total() {
@@ -108,66 +120,77 @@
       $total=0;
       $ids = array_keys($_SESSION['panier']);
 
-      if(empty($ids)) {
-        $produits = array();
-
-      } else {
+      if(!empty($ids)) {
         $DB = new DB();
         $produits = $DB->dbQuery('SELECT id, prix FROM produits WHERE id IN ('.implode(',', $ids).')');
 
         foreach ($produits as $produit) {
           $total += $produit->prix * $_SESSION['panier'][$produit->id];
         }
-        return $total;
       }
+
+      $total *= (100 - $this->reduction) / 100;
+
+      return $total;
     }
 
+    public function setQuantityLess($idProduit, $quantite) {
+
+      $DB = new DB();
+      $this->quantite = $quantite;
+
+      $quantite--;
+      echo $quantite;
+      $statement = $DB->dbQuery('UPDATE produits SET quantite = :quantite WHERE id = :id', array('quantite' => $quantite, 'id' => $idProduit));
+
+    }
+
+    public function setQuantityMore($idProduit, $quantite) {
+
+      $DB = new DB();
+      $this->quantite = $quantite;
+
+      $quantite++;
+
+      $statement = $DB->dbQuery('UPDATE produits SET quantite = :quantite WHERE id = :id', array('quantite' => $quantite, 'id' => $idProduit));
+
+    }
+
+    public function resetQuantity($idProduit, $quantite) {
+
+      $DB = new DB();
+      $this->quantite = $quantite;
+
+      $quantite += $_SESSION['panier'][$idProduit];
+      echo $quantite;
+      $statement = $DB->dbQuery('UPDATE produits SET quantite = :quantite WHERE id = :id', array('quantite' => $quantite, 'id' => $idProduit));
+
+    }
   }
 
-
-  function addProduit() {
+//Récupérer un produit de la base de données
+  function getProduit($idProduit) {
 
     $DB = new DB();
-    global $panier;
 
-    $idAddProduit = htmlspecialchars($_GET['idAddProduit']);
+    $statement = $DB->dbQuery('SELECT * FROM produits WHERE id = :id AND quantite != 0', array('id' => $idProduit));
 
-    $statement = $DB->dbQuery('SELECT * FROM produits WHERE id = :id', array('id' => $idAddProduit));
-
-    $panier->add($statement[0]->id);
-
+    return $statement[0];
   }
 
-
-  function delProduit() {
+//Application d'un code promo
+  function promoFromCode($codepromo) {
 
     $DB = new DB();
-    global $panier;
 
-    $idDelProduit = htmlspecialchars($_GET['idDelProduit']);
+    $statement = $DB->dbQuery('SELECT * FROM codespromo WHERE code = :code', array('code' => $codepromo));
 
-    $statement = $DB->dbQuery('SELECT * FROM produits WHERE id = :id', array('id' => $idDelProduit));
-
-    $panier->del($statement[0]->id);
-
+    return $statement[0];
   }
 
 
-  function unsetProduit() {
-
-    $DB = new DB();
-    global $panier;
-
-    $idUnsetProduit = htmlspecialchars($_GET['idUnsetProduit']);
-
-    $statement = $DB->dbQuery('SELECT * FROM produits WHERE id = :id', array('id' => $idUnsetProduit));
-
-    $panier->del($statement[0]->id);
-
-  }
-
-
-  function redirect($url) { //fonction redirect pour éviter les problèmes de headers de merde
+//fonction redirect pour éviter les problèmes de headers de merde
+  function redirect($url) {
 
     if (!headers_sent()) {
 

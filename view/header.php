@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>TDL Store</title>
-    <meta charset="utf-8">
+  <meta charset="utf-8">
 <!-- Responsive -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <!-- Bootstrap CSS -->

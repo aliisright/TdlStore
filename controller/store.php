@@ -1,6 +1,5 @@
 <?php
   require '../model/_header.php';
-  require '../view/header.php';
 
   if(isset($_POST['trier']) && $_POST['trier'] == '1'){
     $produits = $DB->dbQuery('SELECT * FROM produits ORDER BY prix ASC');
@@ -10,12 +9,19 @@
     $produits = $DB->dbQuery('SELECT * FROM produits');
   }
 
-  require '../view/store.php';
-  require '../view/footer.php';
-
   if(isset($_GET['idAddProduit'])) {
-    addProduit();
+    $idProduit = htmlspecialchars($_GET['idAddProduit']);
+
+    $produit = getProduit($idProduit);
+    $panier->add($produit->quantite ,$produit->id);
+
+    $panier->setQuantityLess($idProduit, $produit->quantite);
+
     redirect('store.php');
   }
+
+  require '../view/header.php';
+  require '../view/store.php';
+  require '../view/footer.php';
 
 ?>

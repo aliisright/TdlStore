@@ -45,6 +45,15 @@ header div {
   text-align: center;
 }
 
+.card-produit a {
+  text-decoration: none;
+  color: black;
+}
+
+.card-text p{
+  font-size: 13px;
+}
+
 .card-prix-add {
   display: flex;
   justify-content: space-between;
@@ -75,7 +84,19 @@ header div {
   text-align: center;
 }
 
+/*----------------------------------------------*/
 
+/* produit.php */
+.titre-produit b{
+  font-size: 25px;
+}
 
+.card-prix-add-produit {
+  float: right;
+  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  width: 200px;
+}
 
 
